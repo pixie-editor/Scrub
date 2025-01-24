@@ -1,0 +1,157 @@
+[gd_scene load_steps=5 format=3 uid="uid://uuh3jqo2jnr6"]
+
+[ext_resource type="Theme" uid="uid://ct30625j7f413" path="res://main/theme.tres" id="1_kqjar"]
+[ext_resource type="Script" path="res://main/scrub_editor.gd" id="2_ge32i"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gqhro"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_it70g"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+bg_color = Color(0.206198, 0.17905, 0.253007, 1)
+
+[node name="scrubby" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_kqjar")
+script = ExtResource("2_ge32i")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 0
+offset_right = 1923.0
+offset_bottom = 40.0
+color = Color(0.207843, 0.180392, 0.25098, 1)
+
+[node name="topcontainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+
+[node name="top_menu" type="MenuBar" parent="topcontainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_gqhro")
+theme_override_styles/normal = SubResource("StyleBoxFlat_it70g")
+
+[node name="file" type="PopupMenu" parent="topcontainer/top_menu"]
+title = "file"
+item_count = 5
+item_0/text = "new"
+item_0/id = 1
+item_1/text = "save"
+item_1/id = 2
+item_2/text = "save as"
+item_2/id = 3
+item_3/text = "open"
+item_3/id = 3
+item_4/text = "import"
+item_4/id = 4
+
+[node name="edit" type="PopupMenu" parent="topcontainer/top_menu"]
+auto_translate_mode = 1
+title = "file"
+item_count = 1
+item_0/text = "import"
+
+[node name="export" type="PopupMenu" parent="topcontainer/top_menu"]
+auto_translate_mode = 1
+title = "file"
+item_count = 1
+item_0/text = "import"
+
+[node name="midsection" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_top = 45.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+
+[node name="midsection2" type="HBoxContainer" parent="midsection"]
+custom_minimum_size = Vector2(0, 700)
+layout_mode = 2
+
+[node name="frame1" type="Control" parent="midsection/midsection2"]
+custom_minimum_size = Vector2(625, 0)
+layout_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="midsection/midsection2/frame1"]
+layout_mode = 2
+offset_left = 1.0
+offset_top = -9.0
+offset_right = 638.0
+offset_bottom = 735.0
+color = Color(0.313974, 0.109026, 0.249271, 1)
+
+[node name="frame2" type="Control" parent="midsection/midsection2"]
+custom_minimum_size = Vector2(1280, 720)
+layout_mode = 2
+
+[node name="viewframe" type="SubViewportContainer" parent="midsection/midsection2/frame2"]
+custom_minimum_size = Vector2(1280, 720)
+layout_mode = 2
+offset_left = 8.0
+offset_top = -8.0
+offset_right = 1288.0
+offset_bottom = 720.0
+
+[node name="SubViewport" type="SubViewport" parent="midsection/midsection2/frame2/viewframe"]
+disable_3d = true
+handle_input_locally = false
+size = Vector2i(1280, 720)
+size_2d_override_stretch = true
+render_target_update_mode = 4
+
+[node name="Label" type="Label" parent="midsection/midsection2/frame2/viewframe/SubViewport"]
+z_index = 4
+offset_right = 85.0
+offset_bottom = 23.0
+text = "a test label"
+
+[node name="ColorRect" type="ColorRect" parent="midsection/midsection2/frame2/viewframe/SubViewport/Label"]
+custom_minimum_size = Vector2(500, 500)
+layout_mode = 0
+offset_top = 549.0
+offset_right = 1920.0
+offset_bottom = 1049.0
+color = Color(0, 0, 0, 1)
+
+[node name="Camera2D" type="Camera2D" parent="midsection/midsection2/frame2/viewframe/SubViewport"]
+offset = Vector2(325, 180)
+zoom = Vector2(0.5, 0.5)
+
+[node name="rendercamera" type="Camera2D" parent="midsection/midsection2/frame2/viewframe/SubViewport"]
+enabled = false
+
+[node name="Control" type="Control" parent="midsection/midsection2/frame2/viewframe/SubViewport"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="timeline" type="HBoxContainer" parent="midsection"]
+custom_minimum_size = Vector2(500, 150)
+layout_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="midsection/timeline"]
+clip_contents = true
+custom_minimum_size = Vector2(2000, 350)
+layout_mode = 2
+color = Color(0.52419, 0.538407, 0.843973, 1)
+
+[node name="tempslider" type="HSlider" parent="midsection/timeline/ColorRect"]
+layout_mode = 2
+offset_left = 34.0
+offset_top = -6.0
+offset_right = 667.0
+offset_bottom = 104.0
+step = 0.01
+
+[node name="SubViewport" type="SubViewport" parent="."]
+
+[connection signal="id_pressed" from="topcontainer/top_menu/file" to="." method="_on_file_button_selected"]
+[connection signal="value_changed" from="midsection/timeline/ColorRect/tempslider" to="." method="_on_tempslider_value_changed"]

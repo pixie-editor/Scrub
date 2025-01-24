@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://nkpyou78djvs"]
+
+[node name="FileDialog" type="FileDialog"]
+title = "Open a File"
+initial_position = 2
+size = Vector2i(600, 600)
+visible = true
+ok_button_text = "Open"
+file_mode = 0

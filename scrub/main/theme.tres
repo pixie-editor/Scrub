@@ -1,0 +1,14 @@
+[gd_resource type="Theme" load_steps=4 format=3 uid="uid://ct30625j7f413"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pvra4"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qjyaw"]
+bg_color = Color(0.7713, 0.462363, 0.817892, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f8ntb"]
+bg_color = Color(0.782439, 0.780177, 1, 1)
+
+[resource]
+MenuBar/styles/disabled = SubResource("StyleBoxFlat_pvra4")
+MenuBar/styles/normal = SubResource("StyleBoxFlat_qjyaw")
+MenuButton/styles/normal = SubResource("StyleBoxFlat_f8ntb")
