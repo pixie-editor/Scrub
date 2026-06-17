@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://b2xdou2jrnte1"]
+
+[ext_resource type="Script" uid="uid://m0olv0kobn67" path="res://tracks/track_media_video.gd" id="1_6cn2d"]
+
+[node name="track_indicator" type="ColorRect" unique_id=279577134]
+clip_contents = true
+custom_minimum_size = Vector2(0, 69)
+offset_right = 129.0
+offset_bottom = 69.0
+mouse_default_cursor_shape = 2
+color = Color(0.28873354, 0.22480139, 0.41607156, 1)
+script = ExtResource("1_6cn2d")
+
+[node name="track_texture" type="TextureRect" parent="." unique_id=1284639062]
+layout_mode = 0
+offset_left = 9.0
+offset_top = 7.0
+offset_right = 61.0
+offset_bottom = 59.0
+expand_mode = 1
+
+[node name="track_name" type="Label" parent="." unique_id=554376375]
+layout_mode = 0
+offset_left = 72.0
+offset_top = 24.0
+offset_right = 112.0
+offset_bottom = 47.0
+theme_override_font_sizes/font_size = 13
+text = "track name"
+clip_text = true
+
+[node name="hover_border" type="TextureRect" parent="." unique_id=574134137]
+layout_mode = 0
+offset_right = 130.0
+offset_bottom = 69.0
+
+[connection signal="gui_input" from="." to="." method="_on_gui_input"]
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

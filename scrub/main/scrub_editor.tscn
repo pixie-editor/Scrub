@@ -1,9 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://uuh3jqo2jnr6"]
+[gd_scene format=3 uid="uid://uuh3jqo2jnr6"]
 
 [ext_resource type="Theme" uid="uid://ct30625j7f413" path="res://main/theme.tres" id="1_kqjar"]
-[ext_resource type="Script" path="res://main/scrub_editor.gd" id="2_ge32i"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gqhro"]
+[ext_resource type="Script" uid="uid://inr4q34g8mfa" path="res://main/scrub_editor.gd" id="2_ge32i"]
+[ext_resource type="Texture2D" uid="uid://dxhw84ce1e4xk" path="res://images/replay.svg" id="3_7o7hh"]
+[ext_resource type="Texture2D" uid="uid://3aaf31r8oc5d" path="res://images/play.svg" id="3_vcdsj"]
+[ext_resource type="Texture2D" uid="uid://ccjoaigqygkjf" path="res://images/pause.svg" id="4_j1xr7"]
+[ext_resource type="Script" uid="uid://b3mat37xu4i7w" path="res://main/control.gd" id="4_vcdsj"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_it70g"]
 content_margin_left = 5.0
@@ -12,7 +14,9 @@ content_margin_right = 5.0
 content_margin_bottom = 5.0
 bg_color = Color(0.206198, 0.17905, 0.253007, 1)
 
-[node name="scrubby" type="Control"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gqhro"]
+
+[node name="scrubby" type="Control" unique_id=1653312585]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,26 +26,118 @@ grow_vertical = 2
 theme = ExtResource("1_kqjar")
 script = ExtResource("2_ge32i")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1561164747]
 layout_mode = 0
 offset_right = 1923.0
 offset_bottom = 40.0
 color = Color(0.207843, 0.180392, 0.25098, 1)
 
-[node name="topcontainer" type="VBoxContainer" parent="."]
+[node name="timeline" type="ColorRect" parent="." unique_id=2125877876]
+clip_contents = true
+custom_minimum_size = Vector2(1920, 350)
+layout_mode = 0
+offset_top = 756.0
+offset_right = 2000.0
+offset_bottom = 1106.0
+color = Color(0.52419, 0.538407, 0.843973, 1)
+
+[node name="toolbar" type="ColorRect" parent="timeline" unique_id=568612349]
+layout_mode = 0
+offset_right = 1924.0
+offset_bottom = 40.0
+color = Color(0.25682923, 0.25159615, 0.5240684, 1)
+
+[node name="projectcontrols" type="HBoxContainer" parent="timeline" unique_id=964006582]
+layout_mode = 0
+offset_left = 652.0
+offset_right = 1916.0
+offset_bottom = 40.0
+alignment = 1
+
+[node name="CheckButton" type="CheckButton" parent="timeline/projectcontrols" unique_id=1266767592]
+layout_mode = 2
+
+[node name="SpinBox" type="SpinBox" parent="timeline/projectcontrols" unique_id=1267931575]
+layout_mode = 2
+
+[node name="TextureButton2" type="TextureButton" parent="timeline/projectcontrols" unique_id=207637766]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+texture_normal = ExtResource("3_7o7hh")
+stretch_mode = 3
+
+[node name="TextureButton" type="TextureButton" parent="timeline/projectcontrols" unique_id=1418241217]
+layout_mode = 2
+toggle_mode = true
+texture_normal = ExtResource("3_vcdsj")
+texture_pressed = ExtResource("4_j1xr7")
+stretch_mode = 3
+
+[node name="seek" type="HSlider" parent="timeline/projectcontrols" unique_id=1803712628]
+custom_minimum_size = Vector2(900, 40)
+layout_mode = 2
+max_value = 10.0
+step = 0.01
+
+[node name="Label" type="Label" parent="timeline/projectcontrols" unique_id=1780404479]
+layout_mode = 2
+text = "0.0"
+
+[node name="Label2" type="Label" parent="timeline/projectcontrols" unique_id=1699018094]
+layout_mode = 2
+text = "/"
+
+[node name="Label3" type="Label" parent="timeline/projectcontrols" unique_id=1366573275]
+layout_mode = 2
+text = "0.0"
+
+[node name="videoelements" type="ScrollContainer" parent="timeline" unique_id=1186107906]
+layout_mode = 0
+offset_top = 72.0
+offset_right = 1922.0
+offset_bottom = 324.0
+horizontal_scroll_mode = 0
+
+[node name="tracks" type="VBoxContainer" parent="timeline/videoelements" unique_id=321737837]
+layout_mode = 2
+
+[node name="timebar" type="ColorRect" parent="timeline" unique_id=409333651]
+layout_mode = 0
+offset_top = 40.0
+offset_right = 1920.0
+offset_bottom = 73.0
+color = Color(0.2159017, 0.21590173, 0.2159017, 1)
+
+[node name="timeline_tex" type="TextureRect" parent="timeline" unique_id=1639076357]
+modulate = Color(1, 1, 1, 0.74509805)
+self_modulate = Color(1, 1, 1, 0.72156864)
+layout_mode = 0
+offset_top = 42.0
+offset_right = 1923.0
+offset_bottom = 327.0
+mouse_filter = 2
+
+[node name="timelabels" type="Control" parent="timeline" unique_id=439230548]
+anchors_preset = 0
+offset_top = 42.0
+offset_right = 1921.0
+offset_bottom = 72.0
+script = ExtResource("4_vcdsj")
+
+[node name="topcontainer" type="VBoxContainer" parent="." unique_id=258506850]
 layout_mode = 0
 offset_right = 1920.0
-offset_bottom = 1080.0
+offset_bottom = 50.0
 
-[node name="top_menu" type="MenuBar" parent="topcontainer"]
+[node name="top_menu" type="MenuBar" parent="topcontainer" unique_id=1172700681]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
-theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_gqhro")
 theme_override_styles/normal = SubResource("StyleBoxFlat_it70g")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_gqhro")
 
-[node name="file" type="PopupMenu" parent="topcontainer/top_menu"]
+[node name="file" type="PopupMenu" parent="topcontainer/top_menu" unique_id=1898348953]
 title = "file"
-item_count = 5
+item_count = 6
 item_0/text = "new"
 item_0/id = 1
 item_1/text = "save"
@@ -52,106 +148,48 @@ item_3/text = "open"
 item_3/id = 3
 item_4/text = "import"
 item_4/id = 4
+item_5/text = "export"
+item_5/id = 5
 
-[node name="edit" type="PopupMenu" parent="topcontainer/top_menu"]
-auto_translate_mode = 1
-title = "file"
-item_count = 1
-item_0/text = "import"
+[node name="edit" type="PopupMenu" parent="topcontainer/top_menu" unique_id=1856313572]
 
-[node name="export" type="PopupMenu" parent="topcontainer/top_menu"]
-auto_translate_mode = 1
-title = "file"
-item_count = 1
-item_0/text = "import"
+[node name="preferences" type="PopupMenu" parent="topcontainer/top_menu" unique_id=265461440]
 
-[node name="midsection" type="VBoxContainer" parent="."]
+[node name="midsection" type="VBoxContainer" parent="." unique_id=164946964]
 layout_mode = 0
-offset_top = 45.0
-offset_right = 1920.0
-offset_bottom = 1080.0
+offset_top = 36.0
+offset_right = 2000.0
+offset_bottom = 756.0
 
-[node name="midsection2" type="HBoxContainer" parent="midsection"]
-custom_minimum_size = Vector2(0, 700)
+[node name="midsection2" type="HBoxContainer" parent="midsection" unique_id=1362611229]
+custom_minimum_size = Vector2(0, 550)
 layout_mode = 2
 
-[node name="frame1" type="Control" parent="midsection/midsection2"]
-custom_minimum_size = Vector2(625, 0)
+[node name="ColorRect" type="ColorRect" parent="midsection/midsection2" unique_id=198416275]
+custom_minimum_size = Vector2(650, 0)
 layout_mode = 2
+color = Color(0.5942037, 0.5141568, 0.81950724, 1)
 
-[node name="ColorRect" type="ColorRect" parent="midsection/midsection2/frame1"]
-layout_mode = 2
-offset_left = 1.0
-offset_top = -9.0
-offset_right = 638.0
-offset_bottom = 735.0
-color = Color(0.313974, 0.109026, 0.249271, 1)
-
-[node name="frame2" type="Control" parent="midsection/midsection2"]
+[node name="viewframe" type="SubViewportContainer" parent="midsection/midsection2" unique_id=465295218]
 custom_minimum_size = Vector2(1280, 720)
 layout_mode = 2
 
-[node name="viewframe" type="SubViewportContainer" parent="midsection/midsection2/frame2"]
-custom_minimum_size = Vector2(1280, 720)
-layout_mode = 2
-offset_left = 8.0
-offset_top = -8.0
-offset_right = 1288.0
-offset_bottom = 720.0
-
-[node name="SubViewport" type="SubViewport" parent="midsection/midsection2/frame2/viewframe"]
+[node name="SubViewport" type="SubViewport" parent="midsection/midsection2/viewframe" unique_id=2096143217]
 disable_3d = true
 handle_input_locally = false
 size = Vector2i(1280, 720)
 size_2d_override_stretch = true
 render_target_update_mode = 4
 
-[node name="Label" type="Label" parent="midsection/midsection2/frame2/viewframe/SubViewport"]
-z_index = 4
-offset_right = 85.0
-offset_bottom = 23.0
-text = "a test label"
-
-[node name="ColorRect" type="ColorRect" parent="midsection/midsection2/frame2/viewframe/SubViewport/Label"]
-custom_minimum_size = Vector2(500, 500)
-layout_mode = 0
-offset_top = 549.0
-offset_right = 1920.0
-offset_bottom = 1049.0
-color = Color(0, 0, 0, 1)
-
-[node name="Camera2D" type="Camera2D" parent="midsection/midsection2/frame2/viewframe/SubViewport"]
+[node name="Camera2D" type="Camera2D" parent="midsection/midsection2/viewframe/SubViewport" unique_id=1916862645]
 offset = Vector2(325, 180)
 zoom = Vector2(0.5, 0.5)
 
-[node name="rendercamera" type="Camera2D" parent="midsection/midsection2/frame2/viewframe/SubViewport"]
+[node name="rendercamera" type="Camera2D" parent="midsection/midsection2/viewframe/SubViewport" unique_id=1787141095]
 enabled = false
 
-[node name="Control" type="Control" parent="midsection/midsection2/frame2/viewframe/SubViewport"]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="timeline" type="HBoxContainer" parent="midsection"]
-custom_minimum_size = Vector2(500, 150)
-layout_mode = 2
-
-[node name="ColorRect" type="ColorRect" parent="midsection/timeline"]
-clip_contents = true
-custom_minimum_size = Vector2(2000, 350)
-layout_mode = 2
-color = Color(0.52419, 0.538407, 0.843973, 1)
-
-[node name="tempslider" type="HSlider" parent="midsection/timeline/ColorRect"]
-layout_mode = 2
-offset_left = 34.0
-offset_top = -6.0
-offset_right = 667.0
-offset_bottom = 104.0
-step = 0.01
-
-[node name="SubViewport" type="SubViewport" parent="."]
-
+[connection signal="value_changed" from="timeline/projectcontrols/seek" to="." method="_on_tempslider_value_changed"]
+[connection signal="gui_input" from="timeline/videoelements/tracks" to="." method="_on_tracks_gui_input"]
 [connection signal="id_pressed" from="topcontainer/top_menu/file" to="." method="_on_file_button_selected"]
-[connection signal="value_changed" from="midsection/timeline/ColorRect/tempslider" to="." method="_on_tempslider_value_changed"]
+[connection signal="mouse_entered" from="midsection/midsection2/viewframe" to="." method="_on_viewframe_mouse_entered"]
+[connection signal="mouse_exited" from="midsection/midsection2/viewframe" to="." method="_on_viewframe_mouse_exited"]

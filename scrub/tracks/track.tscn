@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://bwm46qdgwwech"]
+
+[ext_resource type="Script" uid="uid://c507no3lmserc" path="res://tracks/track.gd" id="1_ycig2"]
+
+[node name="trackvisual" type="ColorRect" unique_id=867455787]
+custom_minimum_size = Vector2(1922, 69)
+offset_right = 2319.0
+offset_bottom = 69.0
+color = Color(0.14406255, 0.14406255, 0.14406255, 1)
+script = ExtResource("1_ycig2")

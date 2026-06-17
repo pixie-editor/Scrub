@@ -1,22 +1,65 @@
 extends Control
-@onready var render_viewport = get_node("midsection/midsection2/frame2/viewframe/SubViewport")
-@onready var camera = get_node("midsection/midsection2/frame2/viewframe/SubViewport/Camera2D")
-@onready var render_camera = get_node("midsection/midsection2/frame2/viewframe/SubViewport/rendercamera")
-@onready var render_control = get_node("midsection/midsection2/frame2/viewframe/SubViewport/Control")
+@onready var render_viewport = get_node("midsection/midsection2/viewframe/SubViewport")
+@onready var camera = get_node("midsection/midsection2/viewframe/SubViewport/Camera2D")
+@onready var render_camera = get_node("midsection/midsection2/viewframe/SubViewport/rendercamera")
+@onready var render_control = get_node("midsection/midsection2/viewframe/SubViewport/Control")
+@onready var track_timeline = $timeline/videoelements/tracks
 
+var tracks = []
 var file_menus = {1: do_new, 2: do_save, 3: do_save_as, 0: do_open, 
 4: do_import}
-var videos = []
 var file_importer = null
 var zoom_speed = 0.1
 var pan_speed = 1.0  # Sensitivity for click-and-drag panning
 var is_panning = false
 var last_mouse_position = Vector2.ZERO
 var frame_sprite: Sprite2D  # This will hold the generated frame image
-
+var mouse_controls = false
+var playing = false
+var is_dragging : bool = false
+var selected_elements : Array = []
+var drag_start_pos : Vector2
+var drag_anchor_x : int = 0
 func _ready() -> void:
 	create_camera_frame()
+	$timeline/timeline_tex.texture = create_timeline_texture(20)
 
+func _process(delta: float) -> void:
+	if is_dragging:
+		var mouse_x = get_global_mouse_position().x
+		var delta_x = mouse_x - ScrubEditor.drag_start_pos.x
+		var anchor_new_x = ScrubEditor.drag_anchor_x + delta_x
+		var anchor_delta = anchor_new_x - selected_elements[0].global_position.x
+
+		for i in selected_elements:
+			i.global_position.x += anchor_delta
+func deselect_items():
+	for item in selected_elements:
+		item.deselect()
+	selected_elements = []
+
+func create_timeline_texture(length_seconds: float) -> Texture2D:
+	var width := int(length_seconds * 100.0) # 100 px = 1 second
+	var height := 64
+
+	var image := Image.create(width, height, false, Image.FORMAT_RGBA8)
+	image.fill(Color.TRANSPARENT)
+	for x in range(width):
+		if x % 100 == 0:
+			# 1 second
+			for y in range(20, height):
+				image.set_pixel(x, y, Color.WHITE)
+
+		elif x % 50 == 0:
+			# Half second
+			for y in range(30, height):
+				image.set_pixel(x, y, Color(0.8, 0.8, 0.8))
+
+		elif x % 25 == 0:
+			# Quarter second
+			for y in range(40, height):
+				image.set_pixel(x, y, Color(0.5, 0.5, 0.5))
+	return ImageTexture.create_from_image(image)
 
 func create_camera_frame():
 	# Get the camera's visible area
@@ -57,10 +100,11 @@ func create_camera_frame():
 	frame_sprite.global_position = top_left + half_screen_size  # Center the sprite
 	frame_sprite.z_index = 10  # Ensure it renders on top
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+
 
 func _input(event):
+	if not mouse_controls:
+		return
 	# Zoom in and out with the mouse wheel
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
@@ -92,17 +136,29 @@ func _on_file_button_selected(id: int) -> void:
 	
 func import_file_from_manager(path : String) -> void:
 	var imported_file = load(path)
-	print(imported_file)
 	if imported_file is VideoStreamTheora:
 		var newplayer = VideoStreamPlayer.new()
 		newplayer.stream = imported_file
-		newplayer.autoplay = true
+		newplayer.paused = true
 		render_viewport.add_child(newplayer)
 		newplayer.play()
-		newplayer.paused = true
-		videos.append(newplayer)
-		var slider = $midsection/timeline/ColorRect/tempslider
-		slider.max_value = newplayer.get_stream_length()
+		var new_track = add_new_track()
+		var imported_media = load("res://tracks/track_media_video.tscn").instantiate()
+		var media_name = path.split("/")
+		media_name = media_name[len(media_name) - 1]
+		imported_media.set_media(newplayer, media_name)
+		new_track.add_element(imported_media, 0)
+	
+func add_new_track():
+	var track_n : int = track_timeline.get_child_count() - 1
+	if track_n == -1:
+		track_n = 0
+	var new_track = load("res://tracks/track.tscn").instantiate()
+	new_track.track_number = track_n
+	track_timeline.add_child(new_track)
+	tracks.append(new_track)
+	return(new_track)
+	
 	
 func do_import() -> void:
 	file_importer = load("res://main/filebrowser.tscn").instantiate()
@@ -123,4 +179,23 @@ func do_save_as() -> void:
 	pass
 
 func _on_tempslider_value_changed(value: float) -> void:
-	videos[0].set_stream_position(value)
+	pass
+
+
+func _on_viewframe_mouse_entered() -> void:
+	mouse_controls = true
+
+
+func _on_viewframe_mouse_exited() -> void:
+	mouse_controls = false
+
+
+func _on_playbutton_pressed() -> void:
+	if playing:
+		playing = false
+	else:
+		playing = true
+
+
+func _on_tracks_gui_input(event: InputEvent) -> void:
+	pass # Replace with function body.
