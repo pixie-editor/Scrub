@@ -3,4 +3,5 @@
 </div>
 
 ##### Scrub
-`scrub` is currently only a concept, but with upgrades to `Godot` and/or GDextension development (and a lot of work,) this will eventually be brought to fruition. This primarily hinges on the implementation of the `seek` function for the `OggTheora` into `godot`.
+- June 2026 update
+Good news! Godot now features the `set_stream_position` functionality this project has been waiting on. Alongside `Pixie, a lot of development is coming!
