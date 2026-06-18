@@ -1,5 +1,5 @@
 <div align="center">
-<img src="https://raw.githubusercontent.com/pixie-editor/Scrub/refs/heads/main/scrub/images/scrubby_icon.svg" width="150"></img>
+<img src="https://github.com/pixie-editor/Scrub/blob/main/scrub/images/scrub.png" width="150"></img>
 </div>
 
 ##### Scrub
