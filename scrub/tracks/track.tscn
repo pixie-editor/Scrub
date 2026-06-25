@@ -6,5 +6,6 @@
 custom_minimum_size = Vector2(1922, 69)
 offset_right = 2319.0
 offset_bottom = 69.0
+mouse_filter = 1
 color = Color(0.14406255, 0.14406255, 0.14406255, 1)
 script = ExtResource("1_ycig2")

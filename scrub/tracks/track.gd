@@ -2,15 +2,18 @@ extends Control
 var track_number : int
 var elements : Array = []
 
-class TrackElement:
-	var element_name : String
-	var start : float
-	var end : float
-	var node : Node
-
 func add_element(element : Node, position : float):
-	var te = TrackElement.new()
-	te.start = position
-	te.end = position + element.time_length
-	te.node = element
+	elements.append(element)
 	add_child(element)
+
+func rerender_track(start : float, timeline_scale : float = 1.0):
+	for element in elements:
+		var element_end = element.start + element.time_length
+		print(element.time_length, "\n\n")
+		print("end", "\n", element_end, "\n", start)
+		if element_end < start:
+			element.position.x = -100000
+			continue
+		var start_diff = element.start - start
+		element.position.x = start_diff * (100 * timeline_scale)
+		

@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://cl5o5yrn7xld2"]
+
+[ext_resource type="PackedScene" uid="uid://bdr3518aguji6" path="res://tracks/track_media_inheriter.tscn" id="1_irrg1"]
+[ext_resource type="Script" uid="uid://bia3o448kb74b" path="res://tracks/track_media_audio.gd" id="2_jdakd"]
+
+[node name="track_indicator" unique_id=279577134 instance=ExtResource("1_irrg1")]
+script = ExtResource("2_jdakd")

@@ -4,7 +4,8 @@ extends Control
 @onready var render_camera = get_node("midsection/midsection2/viewframe/SubViewport/rendercamera")
 @onready var render_control = get_node("midsection/midsection2/viewframe/SubViewport/Control")
 @onready var track_timeline = $timeline/videoelements/tracks
-
+@onready var timelabels = $timeline/timelabels
+@onready var playhead = $timeline/playhead
 var tracks = []
 var file_menus = {1: do_new, 2: do_save, 3: do_save_as, 0: do_open, 
 4: do_import}
@@ -20,9 +21,17 @@ var is_dragging : bool = false
 var selected_elements : Array = []
 var drag_start_pos : Vector2
 var drag_anchor_x : int = 0
+var current_start : float = 0.0
+var current_time : float = 0.0
+var current_track_scale : float = 1.0
+var max_length : float = 0.0
+var scrubbing := false
+var last_render_pos : float = 0.0
+
 func _ready() -> void:
 	create_camera_frame()
 	$timeline/timeline_tex.texture = create_timeline_texture(20)
+	playhead.texture = create_playhead(25)
 
 func _process(delta: float) -> void:
 	if is_dragging:
@@ -33,10 +42,45 @@ func _process(delta: float) -> void:
 
 		for i in selected_elements:
 			i.global_position.x += anchor_delta
+	if scrubbing:
+		seek_to(get_local_mouse_position().x)
 func deselect_items():
 	for item in selected_elements:
 		item.deselect()
 	selected_elements = []
+
+func create_playhead(x_pos: float) -> Texture2D:
+	var size = $timeline/playhead.size
+
+	var image := Image.create(
+		int(size.x),
+		int(size.y),
+		false,
+		Image.FORMAT_RGBA8
+	)
+
+	image.fill(Color.TRANSPARENT)
+
+	# Top grab handle
+	var handle_height := 33
+	var handle_width := 12
+
+	for y in range(min(handle_height, image.get_height())):
+		for x in range(
+			max(0, x_pos - handle_width / 2),
+			min(image.get_width(), x_pos + handle_width / 2)
+		):
+			image.set_pixel(x, y, Color.PALE_VIOLET_RED)
+
+	# Main playhead line
+	for y in range(handle_height, image.get_height()):
+		for x in range(
+			max(0, x_pos - 1),
+			min(image.get_width(), x_pos + 1)
+		):
+			image.set_pixel(x, y, Color.ORANGE_RED)
+
+	return ImageTexture.create_from_image(image)
 
 func create_timeline_texture(length_seconds: float) -> Texture2D:
 	var width := int(length_seconds * 100.0) # 100 px = 1 second
@@ -101,7 +145,6 @@ func create_camera_frame():
 	frame_sprite.z_index = 10  # Ensure it renders on top
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 
-
 func _input(event):
 	if not mouse_controls:
 		return
@@ -117,7 +160,7 @@ func _input(event):
 		camera.zoom.y = clamp(camera.zoom.y, 0.2, 5)
 
 	# Start panning when the left mouse button is pressed
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE:
 		is_panning = event.pressed
 		if is_panning:
 			last_mouse_position = event.position
@@ -131,24 +174,41 @@ func _input(event):
 	elif event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
 		camera.position -= event.relative * camera.zoom
 
+func seek_to(time : float):
+	playhead.texture = create_playhead(time)
+
 func _on_file_button_selected(id: int) -> void:
 	file_menus[id].call()
 	
 func import_file_from_manager(path : String) -> void:
 	var imported_file = load(path)
+	var pathsplits = path.split("/")
+	pathsplits.resize(pathsplits.size() - 1)
+	var directory = "/".join(pathsplits)
 	if imported_file is VideoStreamTheora:
 		var newplayer = VideoStreamPlayer.new()
 		newplayer.stream = imported_file
 		newplayer.paused = true
 		render_viewport.add_child(newplayer)
-		newplayer.play()
+		newplayer.autoplay = true
 		var new_track = add_new_track()
 		var imported_media = load("res://tracks/track_media_video.tscn").instantiate()
 		var media_name = path.split("/")
 		media_name = media_name[len(media_name) - 1]
+		var tmp_directory = ProjectSettings.globalize_path("user://") + "tmp/"
+		tmp_directory = tmp_directory + media_name + ".ogg"
+		OS.execute("ffmpeg", ["-i", path, "-vn", "-acodec", "libvorbis", 
+			tmp_directory])
+		while not FileAccess.file_exists(tmp_directory):
+			pass
+		var audio_track = add_new_track()
+		var audio_media = load("res://tracks/track_media_audio.tscn").instantiate()
+		var audio_stream = AudioStreamOggVorbis.load_from_file(tmp_directory)
+		audio_media.set_media(audio_stream, media_name, tmp_directory)
 		imported_media.set_media(newplayer, media_name)
+		audio_track.add_element(audio_media, 0)
 		new_track.add_element(imported_media, 0)
-	
+
 func add_new_track():
 	var track_n : int = track_timeline.get_child_count() - 1
 	if track_n == -1:
@@ -196,6 +256,34 @@ func _on_playbutton_pressed() -> void:
 	else:
 		playing = true
 
+func rerender_tracks(start_pos : float, track_scale : float):
+	if last_render_pos == start_pos:
+		return
+	last_render_pos = start_pos
+	timelabels.start = start_pos
+	timelabels.timeline_scale = track_scale
+	timelabels.queue_redraw()
+	for track in tracks:
+		track.rerender_track(start_pos, track_scale)
 
 func _on_tracks_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and Input.is_action_pressed("multiselect"):
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			if current_start == 0:
+				return
+			current_start -= (current_track_scale * .25)
+			rerender_tracks(current_start,  current_track_scale)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			current_start += (current_track_scale * .25)
+			rerender_tracks(current_start,  current_track_scale)
+
+
+func _on_timeline_tex_gui_input(event: InputEvent) -> void:
 	pass # Replace with function body.
+
+
+func _on_timelabels_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		scrubbing = event.pressed
+		if scrubbing:
+			seek_to(event.position.x)

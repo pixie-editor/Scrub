@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://dxhw84ce1e4xk" path="res://images/replay.svg" id="3_7o7hh"]
 [ext_resource type="Texture2D" uid="uid://3aaf31r8oc5d" path="res://images/play.svg" id="3_vcdsj"]
 [ext_resource type="Texture2D" uid="uid://ccjoaigqygkjf" path="res://images/pause.svg" id="4_j1xr7"]
-[ext_resource type="Script" uid="uid://b3mat37xu4i7w" path="res://main/control.gd" id="4_vcdsj"]
+[ext_resource type="Script" uid="uid://ciiclerw0cnv6" path="res://main/timeline2.gd" id="6_7o7hh"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_it70g"]
 content_margin_left = 5.0
@@ -59,6 +59,9 @@ layout_mode = 2
 
 [node name="SpinBox" type="SpinBox" parent="timeline/projectcontrols" unique_id=1267931575]
 layout_mode = 2
+max_value = 5.0
+step = 0.1
+value = 1.0
 
 [node name="TextureButton2" type="TextureButton" parent="timeline/projectcontrols" unique_id=207637766]
 custom_minimum_size = Vector2(10, 0)
@@ -118,11 +121,20 @@ offset_bottom = 327.0
 mouse_filter = 2
 
 [node name="timelabels" type="Control" parent="timeline" unique_id=439230548]
+z_index = 3
 anchors_preset = 0
 offset_top = 42.0
-offset_right = 1921.0
+offset_right = 1920.0
 offset_bottom = 72.0
-script = ExtResource("4_vcdsj")
+script = ExtResource("6_7o7hh")
+
+[node name="playhead" type="TextureRect" parent="timeline" unique_id=1329195632]
+layout_mode = 0
+offset_left = -1.0
+offset_top = 40.0
+offset_right = 1923.0
+offset_bottom = 324.0
+mouse_filter = 2
 
 [node name="topcontainer" type="VBoxContainer" parent="." unique_id=258506850]
 layout_mode = 0
@@ -152,6 +164,8 @@ item_5/text = "export"
 item_5/id = 5
 
 [node name="edit" type="PopupMenu" parent="topcontainer/top_menu" unique_id=1856313572]
+
+[node name="generate" type="PopupMenu" parent="topcontainer/top_menu" unique_id=1665857751]
 
 [node name="preferences" type="PopupMenu" parent="topcontainer/top_menu" unique_id=265461440]
 
@@ -189,7 +203,10 @@ zoom = Vector2(0.5, 0.5)
 enabled = false
 
 [connection signal="value_changed" from="timeline/projectcontrols/seek" to="." method="_on_tempslider_value_changed"]
+[connection signal="gui_input" from="timeline/videoelements" to="." method="_on_tracks_gui_input"]
 [connection signal="gui_input" from="timeline/videoelements/tracks" to="." method="_on_tracks_gui_input"]
+[connection signal="gui_input" from="timeline/timeline_tex" to="." method="_on_timeline_tex_gui_input"]
+[connection signal="gui_input" from="timeline/timelabels" to="." method="_on_timelabels_gui_input"]
 [connection signal="id_pressed" from="topcontainer/top_menu/file" to="." method="_on_file_button_selected"]
 [connection signal="mouse_entered" from="midsection/midsection2/viewframe" to="." method="_on_viewframe_mouse_entered"]
 [connection signal="mouse_exited" from="midsection/midsection2/viewframe" to="." method="_on_viewframe_mouse_exited"]
