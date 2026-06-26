@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://ca1xv8img0t86"]
+
+[ext_resource type="Script" uid="uid://bafh02ifhy1u" path="res://elements/audio_element.gd" id="1_7atdl"]
+
+[node name="audio_element" type="Control" unique_id=245456276]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7atdl")
+
+[node name="audio" type="AudioStreamPlayer" parent="." unique_id=278190367]

@@ -1,15 +1,21 @@
 extends ScrubMain.TrackElement
 	
-func set_media(audiop : AudioStream, media_name : String, path : String):
-	var length = audiop.get_length()
+func set_media(audiop, media_name : String, path : String):
+	var length = audiop.get_child(0).stream.get_length()
 	var track_image = ScrubMain.load_audio_img(path, media_name, length)
 	print(track_image)
+	visual_element = audiop
 	var track_text = get_node("track_texture")
 	track_text.texture = ImageTexture.create_from_image(track_image)
 	track_text.size.x = length * 100
 	get_node("track_name").text = media_name
 	set_length(length)
 
+func seek_to(current_time, playing):
+	pass
+
+func continue_play(current_time):
+	pass
 func _on_mouse_entered() -> void:
 	if not selected:
 		$hover_border.texture = create_border_texture(size)

@@ -4,4 +4,5 @@
 [ext_resource type="Script" uid="uid://bia3o448kb74b" path="res://tracks/track_media_audio.gd" id="2_jdakd"]
 
 [node name="track_indicator" unique_id=279577134 instance=ExtResource("1_irrg1")]
+color = Color(0.3713851, 0.19183064, 0.34034538, 1)
 script = ExtResource("2_jdakd")

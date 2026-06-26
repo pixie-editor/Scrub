@@ -6,6 +6,8 @@ extends Control
 @onready var track_timeline = $timeline/videoelements/tracks
 @onready var timelabels = $timeline/timelabels
 @onready var playhead = $timeline/playhead
+@onready var seek_progress = $timeline/projectcontrols/seek
+@onready var elapsed_label = $timeline/projectcontrols/elapsedlabel
 var tracks = []
 var file_menus = {1: do_new, 2: do_save, 3: do_save_as, 0: do_open, 
 4: do_import}
@@ -27,6 +29,8 @@ var current_track_scale : float = 1.0
 var max_length : float = 0.0
 var scrubbing := false
 var last_render_pos : float = 0.0
+var max_time : float = 0.0
+var frame_seek = false
 
 func _ready() -> void:
 	create_camera_frame()
@@ -34,12 +38,16 @@ func _ready() -> void:
 	playhead.texture = create_playhead(25)
 
 func _process(delta: float) -> void:
-	if is_dragging:
+	if playing:
+		current_time += delta
+		seek_play(current_time)
+		elapsed_label.text = str(current_time)
+		seek_progress.value = current_time
+	if is_dragging and selected_elements:
 		var mouse_x = get_global_mouse_position().x
 		var delta_x = mouse_x - ScrubEditor.drag_start_pos.x
 		var anchor_new_x = ScrubEditor.drag_anchor_x + delta_x
 		var anchor_delta = anchor_new_x - selected_elements[0].global_position.x
-
 		for i in selected_elements:
 			i.global_position.x += anchor_delta
 	if scrubbing:
@@ -48,6 +56,15 @@ func deselect_items():
 	for item in selected_elements:
 		item.deselect()
 	selected_elements = []
+
+func get_max_time():
+	for track in tracks:
+		var track_time = track.get_max_time()
+		if track_time > max_time:
+			max_time = track_time
+	seek_progress.max_value = max_time
+	$timeline/projectcontrols/total_timelabel.text = str(max_time)
+	return(max_time)
 
 func create_playhead(x_pos: float) -> Texture2D:
 	var size = $timeline/playhead.size
@@ -175,7 +192,16 @@ func _input(event):
 		camera.position -= event.relative * camera.zoom
 
 func seek_to(time : float):
-	playhead.texture = create_playhead(time)
+	playhead.texture = create_playhead(time * current_track_scale)
+	current_time = (time / 100 + current_start) * current_track_scale
+	for track in tracks:
+		track.seek_elements(current_time, playing)
+
+func seek_play(time : float):
+	playhead.texture = create_playhead((time - current_start) * 100 * current_track_scale)
+	current_time = time
+	for track in tracks:
+		track.play_elements(current_time)
 
 func _on_file_button_selected(id: int) -> void:
 	file_menus[id].call()
@@ -186,11 +212,11 @@ func import_file_from_manager(path : String) -> void:
 	pathsplits.resize(pathsplits.size() - 1)
 	var directory = "/".join(pathsplits)
 	if imported_file is VideoStreamTheora:
-		var newplayer = VideoStreamPlayer.new()
-		newplayer.stream = imported_file
-		newplayer.paused = true
+		var newplayer = load("res://elements/video_element.tscn").instantiate()
+		var newplayer_video = newplayer.get_child(0)
+		newplayer_video.stream = imported_file
+		newplayer_video.paused = true
 		render_viewport.add_child(newplayer)
-		newplayer.autoplay = true
 		var new_track = add_new_track()
 		var imported_media = load("res://tracks/track_media_video.tscn").instantiate()
 		var media_name = path.split("/")
@@ -203,12 +229,14 @@ func import_file_from_manager(path : String) -> void:
 			pass
 		var audio_track = add_new_track()
 		var audio_media = load("res://tracks/track_media_audio.tscn").instantiate()
-		var audio_stream = AudioStreamOggVorbis.load_from_file(tmp_directory)
+		var audio_stream = load("res://elements/audio_element.tscn").instantiate()
+		audio_stream.get_child(0).stream = AudioStreamOggVorbis.load_from_file(tmp_directory)
 		audio_media.set_media(audio_stream, media_name, tmp_directory)
 		imported_media.set_media(newplayer, media_name)
-		audio_track.add_element(audio_media, 0)
-		new_track.add_element(imported_media, 0)
-
+		audio_track.add_element(audio_media, current_time)
+		new_track.add_element(imported_media, current_time)
+		get_max_time()
+		
 func add_new_track():
 	var track_n : int = track_timeline.get_child_count() - 1
 	if track_n == -1:
@@ -238,10 +266,6 @@ func do_open() -> void:
 func do_save_as() -> void:
 	pass
 
-func _on_tempslider_value_changed(value: float) -> void:
-	pass
-
-
 func _on_viewframe_mouse_entered() -> void:
 	mouse_controls = true
 
@@ -249,12 +273,12 @@ func _on_viewframe_mouse_entered() -> void:
 func _on_viewframe_mouse_exited() -> void:
 	mouse_controls = false
 
-
 func _on_playbutton_pressed() -> void:
+	playing = not playing
 	if playing:
-		playing = false
+		frame_seek = true
 	else:
-		playing = true
+		frame_seek = false
 
 func rerender_tracks(start_pos : float, track_scale : float):
 	if last_render_pos == start_pos:
@@ -277,13 +301,14 @@ func _on_tracks_gui_input(event: InputEvent) -> void:
 			current_start += (current_track_scale * .25)
 			rerender_tracks(current_start,  current_track_scale)
 
-
-func _on_timeline_tex_gui_input(event: InputEvent) -> void:
-	pass # Replace with function body.
-
-
 func _on_timelabels_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		scrubbing = event.pressed
 		if scrubbing:
 			seek_to(event.position.x)
+
+
+func _on_seek_value_changed(value: float) -> void:
+	if frame_seek:
+		return
+	seek_to(value)

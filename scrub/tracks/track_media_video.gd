@@ -1,10 +1,25 @@
 extends ScrubMain.TrackElement
 
-func set_media(video : VideoStreamPlayer, media_name : String):
-		get_node("track_texture").texture = video.get_video_texture()
+func set_media(video, media_name : String):
+		get_node("track_texture").texture = video.get_seek_texture()
 		get_node("track_name").text = media_name
 		set_length(video.get_stream_length())
+		visual_element = video
 		
+func seek_to(current_time, playing):
+	visual_element.seek_to(current_time, playing)
+
+func continue_play(current_time):
+	if current_time < start or current_time > start + time_length:
+		visual_element.visible = false
+		return
+	visual_element.visible = true
+	if not visual_element.video.is_playing():
+		if start < current_time:
+			visual_element.seek_to(current_time - start, true)
+		else:
+			visual_element.seek_to(start, true)
+	
 func _on_mouse_entered() -> void:
 	if not selected:
 		$hover_border.texture = create_border_texture(size)

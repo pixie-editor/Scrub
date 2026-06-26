@@ -69,7 +69,7 @@ layout_mode = 2
 texture_normal = ExtResource("3_7o7hh")
 stretch_mode = 3
 
-[node name="TextureButton" type="TextureButton" parent="timeline/projectcontrols" unique_id=1418241217]
+[node name="playbutton" type="TextureButton" parent="timeline/projectcontrols" unique_id=1418241217]
 layout_mode = 2
 toggle_mode = true
 texture_normal = ExtResource("3_vcdsj")
@@ -82,7 +82,7 @@ layout_mode = 2
 max_value = 10.0
 step = 0.01
 
-[node name="Label" type="Label" parent="timeline/projectcontrols" unique_id=1780404479]
+[node name="elapsedlabel" type="Label" parent="timeline/projectcontrols" unique_id=1780404479]
 layout_mode = 2
 text = "0.0"
 
@@ -90,7 +90,7 @@ text = "0.0"
 layout_mode = 2
 text = "/"
 
-[node name="Label3" type="Label" parent="timeline/projectcontrols" unique_id=1366573275]
+[node name="total_timelabel" type="Label" parent="timeline/projectcontrols" unique_id=1366573275]
 layout_mode = 2
 text = "0.0"
 
@@ -196,16 +196,24 @@ size_2d_override_stretch = true
 render_target_update_mode = 4
 
 [node name="Camera2D" type="Camera2D" parent="midsection/midsection2/viewframe/SubViewport" unique_id=1916862645]
-offset = Vector2(325, 180)
 zoom = Vector2(0.5, 0.5)
 
 [node name="rendercamera" type="Camera2D" parent="midsection/midsection2/viewframe/SubViewport" unique_id=1787141095]
 enabled = false
 
-[connection signal="value_changed" from="timeline/projectcontrols/seek" to="." method="_on_tempslider_value_changed"]
+[node name="background" type="ColorRect" parent="midsection/midsection2/viewframe/SubViewport" unique_id=43741994]
+z_index = -6
+custom_minimum_size = Vector2(5000000, 500000)
+offset_left = -5000.0
+offset_top = -5000.0
+offset_right = 4995000.0
+offset_bottom = 495000.0
+color = Color(0.056291588, 0.056291603, 0.056291595, 1)
+
+[connection signal="pressed" from="timeline/projectcontrols/playbutton" to="." method="_on_playbutton_pressed"]
+[connection signal="value_changed" from="timeline/projectcontrols/seek" to="." method="_on_seek_value_changed"]
 [connection signal="gui_input" from="timeline/videoelements" to="." method="_on_tracks_gui_input"]
 [connection signal="gui_input" from="timeline/videoelements/tracks" to="." method="_on_tracks_gui_input"]
-[connection signal="gui_input" from="timeline/timeline_tex" to="." method="_on_timeline_tex_gui_input"]
 [connection signal="gui_input" from="timeline/timelabels" to="." method="_on_timelabels_gui_input"]
 [connection signal="id_pressed" from="topcontainer/top_menu/file" to="." method="_on_file_button_selected"]
 [connection signal="mouse_entered" from="midsection/midsection2/viewframe" to="." method="_on_viewframe_mouse_entered"]

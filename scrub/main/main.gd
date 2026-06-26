@@ -23,7 +23,7 @@ class TrackElement:
 	var selected : bool = false
 	var element_name : String
 	var start : float
-	var node : Node
+	var visual_element : Node
 
 	func set_length(value : float):
 		time_length = value
@@ -56,4 +56,4 @@ class TrackElement:
 
 		return ImageTexture.create_from_image(img)
 class VisualElement:
-	pass
+	extends Control
